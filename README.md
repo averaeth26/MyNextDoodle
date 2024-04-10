@@ -1,2 +1,2 @@
 # MyNextDoodle
-Animated Checkers Game for APCSA
+Animated Checkers Game for APCSA.
