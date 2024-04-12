@@ -1,15 +1,21 @@
 import doodlepad.*;
+import java.util.ArrayList;
 
 
 public class Man {
     int currentRow;
     int currentCol;
+    int tileWidth;
+    int tileHeight;
     Oval hitbox;
     boolean king = false;
-    public Man(int row, int col) {
+    public Man(int row, int col, int width, int height) {
         currentRow = row;
         currentCol = col;
-        hitbox = new Oval(currentRow*150 + 15, currentCol*150 + 15, 120, 120);
+        tileWidth = width;
+        tileHeight = height;
+        hitbox = new Oval(currentRow*tileWidth + 15, currentCol*tileHeight + 15, tileWidth-30, tileHeight-30);
+        hitbox.setFillColor(190, 0, 0);
     }
 
     public int getRow() {
@@ -27,5 +33,4 @@ public class Man {
     public Oval getHitbox() {
         return hitbox;
     }
-
 }
