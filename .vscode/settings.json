@@ -1,6 +1,7 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "doodlepad.jar"
+        "doodlepad.jar",
+        "doodlepad (1).jar"
     ]
 }
