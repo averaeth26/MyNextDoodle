@@ -15,7 +15,7 @@ public class Man {
         tileWidth = width;
         tileHeight = height;
         hitbox = new Oval(currentRow*tileWidth + 15, currentCol*tileHeight + 15, tileWidth-30, tileHeight-30);
-        hitbox.setFillColor(190, 0, 0);
+
     }
 
     public int getRow() {
