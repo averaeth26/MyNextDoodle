@@ -71,9 +71,19 @@ public class Checkers {
         drawPieces();
     } 
 
-    public ArrayList<int[]> getAdjacentDiagonalMoves() {
+    public ArrayList<int[]> getAdjacentDiagonalMoves(TileType squareType) {
         ArrayList<int[]> possibleMoves = new ArrayList<int[]>();
-        int[][] possibleDirections = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+        ArrayList<int[]> possibleDirections = new ArrayList<int[]>();
+        if (squareType == TileType.RED_PLAYER) {
+            int[][] directions = {{-1, -1}, {-1, 1}};
+            possibleDirections.add(directions[0]);
+            possibleDirections.add(directions[1]);
+        }
+        else if (squareType == TileType.BLACK_PLAYER) {
+            int[][] directions = {{1, -1}, {1, 1}};
+            possibleDirections.add(directions[0]);
+            possibleDirections.add(directions[1]);
+        }
         for (int[] dV : possibleDirections) {
             if (selectedPieceRow+dV[0] < numTiles && selectedPieceRow+dV[0] >= 0 && selectedPieceCol+dV[1] < numTiles && selectedPieceCol+dV[1] >= 0) {
                 int[] temp = {dV[0], dV[1]};
@@ -84,11 +94,11 @@ public class Checkers {
     }
 
     
-    // TODO: Need to include jumping over other pieces here.
+    // TODO: Need to include chain jumping over other pieces here.
     public void calculateValidMoves(double pieceX, double pieceY) {
         selectedPieceRow = (int)pieceY/squareHeight;
         selectedPieceCol = (int)pieceX/squareWidth;
-        for (int[] move : getAdjacentDiagonalMoves()) {
+        for (int[] move : getAdjacentDiagonalMoves(grid[selectedPieceRow][selectedPieceCol])) {
             int moveRow = selectedPieceRow+move[0];
             int moveCol = selectedPieceCol+move[1];
             if (grid[moveRow][moveCol] == TileType.EMPTY) {
