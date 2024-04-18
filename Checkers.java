@@ -6,13 +6,11 @@ import javax.management.openmbean.ArrayType;
 public class Checkers {
 
     enum TileType { // From https://www.w3schools.com/java/java_enums.asp
-        EMPTY(0),
-        RED_PLAYER(1),
-        BLACK_PLAYER(2);
-        int currentVal;
-        TileType(int val) {
-            this.currentVal = val;
-        }
+        EMPTY,
+        RED_PLAYER,
+        BLACK_PLAYER,
+        RED_KING,
+        BLACK_KING
     }
     int screenWidth = 800;
     int screenHeight = 800;
@@ -69,7 +67,7 @@ public class Checkers {
             grid[(selectedPieceRow+(int)shp.getCenter().getY()/squareHeight)/2][(selectedPieceCol+(int)shp.getCenter().getX()/squareWidth)/2] = TileType.EMPTY;
         }
         drawPieces();
-    } 
+    }
 
     public ArrayList<int[]> getAdjacentDiagonalMoves(TileType squareType) {
         ArrayList<int[]> possibleMoves = new ArrayList<int[]>();
@@ -83,6 +81,18 @@ public class Checkers {
             int[][] directions = {{1, -1}, {1, 1}};
             possibleDirections.add(directions[0]);
             possibleDirections.add(directions[1]);
+        }
+        else if (squareType == TileType.BLACK_KING) {
+            int[][] directions = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
+            for (int i = 0; i < 4; i++) {
+                possibleDirections.add(directions[i]);
+            }
+        }
+        else if (squareType == TileType.RED_KING) {
+            int[][] directions = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
+            for (int i = 0; i < 4; i++) {
+                possibleDirections.add(directions[i]);
+            }
         }
         for (int[] dV : possibleDirections) {
             if (selectedPieceRow+dV[0] < numTiles && selectedPieceRow+dV[0] >= 0 && selectedPieceCol+dV[1] < numTiles && selectedPieceCol+dV[1] >= 0) {
@@ -125,10 +135,10 @@ public class Checkers {
                 }
                 if ((r+c)%2 != 0) {
                     if (r > numTiles / 2) {
-                        grid[r][c] = TileType.RED_PLAYER;
+                        grid[r][c] = TileType.RED_KING;
                     }
                     else {
-                        grid[r][c] = TileType.BLACK_PLAYER;
+                        grid[r][c] = TileType.BLACK_KING;
                     }
                 }
             }
@@ -138,6 +148,7 @@ public class Checkers {
     public ArrayList<Man> drawPieces() {
         drawBackground();
         ArrayList<Man> currPieces = new ArrayList<Man>();
+        ArrayList<Image> kingImages = new ArrayList<Image>();
         for (int i = 0; i < numTiles; i++) {
             for (int j = 0; j < numTiles; j++) {
                 if (grid[i][j] == TileType.RED_PLAYER) {
@@ -150,7 +161,19 @@ public class Checkers {
                     currPieces.get(currPieces.size()-1).getHitbox().setMousePressedHandler(this::onPieceClicked);
                     currPieces.get(currPieces.size()-1).getHitbox().setFillColor(0);
                     currPieces.get(currPieces.size()-1).getHitbox().setStrokeColor(110);
-
+                }
+                else if (grid[i][j] == TileType.RED_KING) {
+                    currPieces.add(new Man(j, i, squareWidth, squareHeight));
+                    currPieces.get(currPieces.size()-1).getHitbox().setFillColor(190, 0, 0);
+                    kingImages.add(new Image("Checkers_Red.png", j*squareWidth+15, i*squareHeight+15, squareWidth-30, squareHeight-30));
+                    kingImages.get(kingImages.size()-1).setMousePressedHandler(this::onPieceClicked);
+                }
+                else if (grid[i][j] == TileType.BLACK_KING) {
+                    currPieces.add(new Man(j, i, squareWidth, squareHeight));
+                    currPieces.get(currPieces.size()-1).getHitbox().setFillColor(0);
+                    currPieces.get(currPieces.size()-1).getHitbox().setStrokeColor(110);
+                    kingImages.add(new Image("Checkers_Black.png", j*squareWidth+15, i*squareHeight+15, squareWidth-30, squareHeight-30));
+                    kingImages.get(kingImages.size()-1).setMousePressedHandler(this::onPieceClicked);
 
                 }
 
