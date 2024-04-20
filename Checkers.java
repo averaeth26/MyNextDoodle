@@ -94,7 +94,6 @@ public class Checkers {
     }
 
     
-    // TODO: Need to include chain jumping over other pieces here.
     public void calculateValidMoves(double pieceX, double pieceY) {
         selectedPieceRow = (int)pieceY/squareHeight;
         selectedPieceCol = (int)pieceX/squareWidth;
