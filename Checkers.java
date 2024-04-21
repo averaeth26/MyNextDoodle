@@ -1,8 +1,12 @@
 import doodlepad.*;
 import java.util.ArrayList;
 
-import javax.management.openmbean.ArrayType;
-
+/**
+Checkers.java
+@author Ethan Avera
+@since 4/10/24
+This class handles the functionality of running the checkers game and the logic behind control of the pieces.
+*/
 public class Checkers {
 
     enum TileType { // From https://www.w3schools.com/java/java_enums.asp
@@ -17,6 +21,7 @@ public class Checkers {
     int numTiles = 8;
     int selectedPieceRow;
     int selectedPieceCol;
+    String winner;
     Pad p = new Pad(screenWidth, screenHeight);
     int squareWidth = screenWidth/numTiles;;
     int squareHeight= screenHeight/numTiles;;
@@ -24,12 +29,33 @@ public class Checkers {
     ArrayList<Man> pieces = new ArrayList<Man>();
     TileType[][] grid = new TileType[numTiles][numTiles];
     
+    /*
+    Checkers class constructor
+    Constructor sets up the game board
+    */
     public Checkers() {
+        initiateSetup();
+    }
+
+    // Function for game setup, called on startup and on reset
+    public void initiateSetup() {
         generateGrid();
         generatePieceGrid();
         drawPieces();
     }
 
+    /*
+    Resets game, onclick method for play again button
+    No return type
+    */
+    public void resetGame(Shape shp, double x, double y, int button) {
+        initiateSetup();
+    }
+
+    /*
+    Draws the background squares of the checkers board 
+    No return type
+    */
     public void drawBackground() {
         ArrayList<Rectangle> gridSquares = new ArrayList<Rectangle>();
         for (int i = 0; i < numTiles; i++) {
@@ -45,6 +71,10 @@ public class Checkers {
         }
     }
 
+    /*
+    Generates an empty checkers board.
+    No return type
+    */
     public void generateGrid() {
         for (int i = 0; i < numTiles; i++) {
             for (int j = 0; j < numTiles; j++) {
@@ -53,22 +83,42 @@ public class Checkers {
         }
     }
 
+    /*
+    Piece onclick function
+    Manages functionality of showing valid moves and updating the screen
+    No return type
+    */
     public void onPieceClicked(Shape shp, double x, double y, int button) {
         p.clear();
         drawPieces();
         calculateValidMoves(shp.getCenter().getX(), shp.getCenter().getY());
     }
 
+    /*
+    Valid move dot onclick function
+    Moves the player based on the position of the square clicked
+    Also handles king promotions and win checks
+    No return type
+    */
     public void selectMoveChoice(Shape shp, double x, double y, int button) {
         grid[(int)shp.getCenter().getY()/squareHeight][(int)shp.getCenter().getX()/squareWidth] = grid[selectedPieceRow][selectedPieceCol];
         grid[selectedPieceRow][selectedPieceCol] = TileType.EMPTY;
         if (Math.abs(selectedPieceRow-(int)shp.getCenter().getY()/squareHeight) > 1) {
-            System.out.println((selectedPieceRow+(int)shp.getCenter().getY()/squareHeight)/2);
             grid[(selectedPieceRow+(int)shp.getCenter().getY()/squareHeight)/2][(selectedPieceCol+(int)shp.getCenter().getX()/squareWidth)/2] = TileType.EMPTY;
         }
+        checkAndApplyPromotions();
         drawPieces();
+        winner = determineWinner();
+        if (!winner.equals("")) {
+            drawWinScreen(winner);
+        }
+
     }
 
+    /*
+    Calculates all possible moves that are on the board based on the selected piece type
+    returns an arrayList of integer arrays representing the valid move data.
+    */
     public ArrayList<int[]> getAdjacentDiagonalMoves(TileType squareType) {
         ArrayList<int[]> possibleMoves = new ArrayList<int[]>();
         ArrayList<int[]> possibleDirections = new ArrayList<int[]>();
@@ -82,13 +132,7 @@ public class Checkers {
             possibleDirections.add(directions[0]);
             possibleDirections.add(directions[1]);
         }
-        else if (squareType == TileType.BLACK_KING) {
-            int[][] directions = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
-            for (int i = 0; i < 4; i++) {
-                possibleDirections.add(directions[i]);
-            }
-        }
-        else if (squareType == TileType.RED_KING) {
+        else if (squareType == TileType.BLACK_KING || squareType == TileType.RED_KING) {
             int[][] directions = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
             for (int i = 0; i < 4; i++) {
                 possibleDirections.add(directions[i]);
@@ -103,7 +147,11 @@ public class Checkers {
         return possibleMoves;
     }
 
-    
+    /*
+    Calculates all moves from possible moves above that aren't taken by another piece
+    Also handles piece-jumping calculations
+    No return type
+    */
     public void calculateValidMoves(double pieceX, double pieceY) {
         selectedPieceRow = (int)pieceY/squareHeight;
         selectedPieceCol = (int)pieceX/squareWidth;
@@ -125,26 +173,97 @@ public class Checkers {
         }
     }
 
+    /*
+    Generates a starting piece grid
+    No return type
+    */
     public void generatePieceGrid() {
         for (int r = 0; r < numTiles; r++) {
-            System.out.println(((double)numTiles/2.0) - (double)r);
             for (int c = 0; c < numTiles; c++) {
                 if (((double)numTiles/2.0) - (double)r < 2 && ((double)numTiles/2.0) - (double)r > -1) {
                     continue;
                 }
                 if ((r+c)%2 != 0) {
                     if (r > numTiles / 2) {
-                        grid[r][c] = TileType.RED_KING;
+                        grid[r][c] = TileType.RED_PLAYER;
                     }
                     else {
-                        grid[r][c] = TileType.BLACK_KING;
+                        grid[r][c] = TileType.BLACK_PLAYER;
                     }
                 }
             }
         }
     }
 
-    public ArrayList<Man> drawPieces() {
+    /*
+    Handles piece promotion logic
+    No return type
+    */
+    public void checkAndApplyPromotions() {
+        for (int c = 0; c < numTiles; c++) {
+            if (grid[0][c] == TileType.RED_PLAYER) {
+                grid[0][c] = TileType.RED_KING;
+            }
+            else if (grid[numTiles-1][c] == TileType.BLACK_PLAYER) {
+                grid[numTiles-1][c] = TileType.BLACK_KING;
+            }
+        }
+    }
+
+    /*
+    Checks if a player has won the checkers game
+    Returns the winning player
+    */
+    public String determineWinner() {
+        boolean redOver = true;
+        boolean blackOver = true;
+        for (int i = 0; i < numTiles; i++) {
+            for (int j = 0; j < numTiles; j++) {
+                if (grid[i][j] == TileType.RED_PLAYER || grid[i][j] == TileType.RED_KING) {
+                    redOver = false;
+                }
+                if (grid[i][j] == TileType.BLACK_PLAYER || grid[i][j] == TileType.BLACK_KING) {
+                    blackOver = false;
+                }
+            }
+        }
+        if (redOver && !blackOver) {
+            return "Black";
+        }
+        else if (blackOver && !redOver) {
+            return "Red";
+        }
+        return "";
+
+        
+    }
+
+    /*
+    Draws the winscreen once a player has won the game
+    No return type
+    */
+    public void drawWinScreen(String winPlayer) {
+        Rectangle background = new Rectangle(0, 0, screenWidth, screenHeight);
+        background.setFillColor(0, 0, 0, 128);
+        String textString = winPlayer + " Player Wins!";
+        // Text is set to (0, 0) temporarily before it is centered on the screen.
+        Text winnerText = new Text(textString, 0, 0, screenWidth/16);
+        winnerText.setCenter(screenWidth/2, 5*(screenHeight/16));
+        winnerText.setFillColor(220, 220, 0);
+        RoundRect playAgainButton = new RoundRect(screenWidth/3, screenHeight/2+screenHeight/100, screenWidth/3, screenWidth/4-screenHeight/50, 10, 10);
+        Text playAgainText = new Text("Play Again", 0, 0, screenWidth/16);
+        playAgainText.setFillColor(128);
+        playAgainText.setCenter(screenWidth/2, 5*(screenHeight/8));
+        playAgainButton.setStrokeWidth(screenWidth/200);
+        playAgainButton.setStrokeColor(0);
+        playAgainButton.setMouseClickedHandler(this::resetGame);
+    }
+
+    /*
+    Draws the pieces based on the current piece grid
+    No return type
+    */
+    public void drawPieces() {
         drawBackground();
         ArrayList<Man> currPieces = new ArrayList<Man>();
         ArrayList<Image> kingImages = new ArrayList<Image>();
@@ -164,23 +283,20 @@ public class Checkers {
                 else if (grid[i][j] == TileType.RED_KING) {
                     currPieces.add(new Man(j, i, squareWidth, squareHeight));
                     currPieces.get(currPieces.size()-1).getHitbox().setFillColor(190, 0, 0);
-                    kingImages.add(new Image("Checkers_Red.png", j*squareWidth+15, i*squareHeight+15, squareWidth-30, squareHeight-30));
+                    kingImages.add(new Image("Checkers_Red.png", j*squareWidth+20, i*squareHeight+20, squareWidth-40, squareHeight-40));
                     kingImages.get(kingImages.size()-1).setMousePressedHandler(this::onPieceClicked);
                 }
                 else if (grid[i][j] == TileType.BLACK_KING) {
                     currPieces.add(new Man(j, i, squareWidth, squareHeight));
                     currPieces.get(currPieces.size()-1).getHitbox().setFillColor(0);
                     currPieces.get(currPieces.size()-1).getHitbox().setStrokeColor(110);
-                    kingImages.add(new Image("Checkers_Black.png", j*squareWidth+15, i*squareHeight+15, squareWidth-30, squareHeight-30));
+                    kingImages.add(new Image("Checkers_Black.png", j*squareWidth+20, i*squareHeight+20, squareWidth-40, squareHeight-40));
                     kingImages.get(kingImages.size()-1).setMousePressedHandler(this::onPieceClicked);
 
                 }
 
             }
         }
-        return currPieces;
-
-
     }
 
 }
