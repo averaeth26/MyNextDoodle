@@ -1,4 +1,6 @@
 import doodlepad.*;
+
+import java.awt.Font;
 import java.util.ArrayList;
 
 /**
@@ -35,6 +37,7 @@ public class Checkers {
     */
     public Checkers() {
         initiateSetup();
+        drawTitleScreen();
     }
 
     // Function for game setup, called on startup and on reset
@@ -257,6 +260,42 @@ public class Checkers {
         playAgainButton.setStrokeWidth(screenWidth/200);
         playAgainButton.setStrokeColor(0);
         playAgainButton.setMouseClickedHandler(this::resetGame);
+        playAgainText.setMouseClickedHandler(this::resetGame);
+    }
+
+    /*
+    Draws the title screen
+    Called on startup
+    No return type
+    */
+    public void drawTitleScreen() {
+        Rectangle background = new Rectangle(0, 0, screenWidth, screenHeight);
+        background.setFillColor(0, 0, 0, 128);
+        // Text is set to (0, 0) temporarily before it is centered on the screen.
+        String titleString = "CHECKERS";
+        ArrayList<Text> titleText = new ArrayList<Text>();
+        for (int i = 0; i < titleString.length(); i++) {
+            titleText.add(new Text(titleString.substring(i, i+1), i*(screenWidth/8), 5*(screenHeight/16)+(screenHeight/40)*(i%2), screenHeight/6));
+            if (i % 2 == 0) {
+                titleText.get(titleText.size()-1).setFillColor(0);
+                titleText.get(titleText.size()-1).setStrokeWidth(screenWidth/400); 
+                titleText.get(titleText.size()-1).setStrokeColor(220); 
+            }
+            else {
+                titleText.get(titleText.size()-1).setFillColor(220); 
+                titleText.get(titleText.size()-1).setStrokeWidth(screenWidth/400); 
+                titleText.get(titleText.size()-1).setStrokeColor(0); 
+            }
+        }
+        
+        RoundRect playButton = new RoundRect(screenWidth/3, screenHeight/2+screenHeight/100, screenWidth/3, screenWidth/4-screenHeight/50, 10, 10);
+        Text playText = new Text("Play", 0, 0, screenWidth/16);
+        playText.setFillColor(128);
+        playText.setCenter(screenWidth/2, 5*(screenHeight/8));
+        playButton.setStrokeWidth(screenWidth/200);
+        playButton.setStrokeColor(0);
+        playButton.setMouseClickedHandler(this::resetGame);
+        playText.setMouseClickedHandler(this::resetGame);
     }
 
     /*
