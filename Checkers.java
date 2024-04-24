@@ -55,6 +55,10 @@ public class Checkers {
         initiateSetup();
     }
 
+    public void switchToRulesScreen(Shape shp, double x, double y, int button) {
+        drawRulesScreen();
+    }
+
     /*
     Draws the background squares of the checkers board 
     No return type
@@ -268,7 +272,7 @@ public class Checkers {
     Called on startup
     No return type
     */
-    public void drawTitleScreen() {
+    public void drawTitleScreen () {
         Rectangle background = new Rectangle(0, 0, screenWidth, screenHeight);
         background.setFillColor(0, 0, 0, 128);
         // Text is set to (0, 0) temporarily before it is centered on the screen.
@@ -296,6 +300,17 @@ public class Checkers {
         playButton.setStrokeColor(0);
         playButton.setMouseClickedHandler(this::resetGame);
         playText.setMouseClickedHandler(this::resetGame);
+        RoundRect rulesButton = new RoundRect(5*(screenWidth/6)-10, 10, screenWidth/6, screenHeight/12, 8, 8);
+        Text rulesText = new Text("Rules", 0, 0, screenWidth/32);
+        rulesText.setCenter(rulesButton.getCenter().getX() + screenWidth/400, rulesButton.getCenter().getY() + screenHeight/125);
+        rulesButton.setMouseClickedHandler(this::switchToRulesScreen);
+
+
+
+    }
+
+    public void drawRulesScreen() {
+        Image rulesImg = new Image();
     }
 
     /*
