@@ -30,6 +30,7 @@ public class Checkers {
     ArrayList<Oval> validMoves = new ArrayList<Oval>();
     ArrayList<Man> pieces = new ArrayList<Man>();
     TileType[][] grid = new TileType[numTiles][numTiles];
+    Image rulesImg;
     
     /*
     Checkers class constructor
@@ -57,6 +58,11 @@ public class Checkers {
 
     public void switchToRulesScreen(Shape shp, double x, double y, int button) {
         drawRulesScreen();
+    }
+    public void switchToTitleScreen(Shape shp, double x, double y, int button) {
+        p.clear();
+        initiateSetup();
+        drawTitleScreen();
     }
 
     /*
@@ -304,13 +310,21 @@ public class Checkers {
         Text rulesText = new Text("Rules", 0, 0, screenWidth/32);
         rulesText.setCenter(rulesButton.getCenter().getX() + screenWidth/400, rulesButton.getCenter().getY() + screenHeight/125);
         rulesButton.setMouseClickedHandler(this::switchToRulesScreen);
+        rulesText.setMouseClickedHandler(this::switchToRulesScreen);
+
 
 
 
     }
 
     public void drawRulesScreen() {
-        Image rulesImg = new Image();
+        rulesImg = new Image("Checkers_Rules.png", screenWidth/8, screenHeight/8, 3*(screenWidth/4), 3*(screenHeight/4));
+        RoundRect rulesButton = new RoundRect(5*(screenWidth/6)-10, 10, screenWidth/6, screenHeight/12, 8, 8);
+        Text rulesText = new Text("Rules", 0, 0, screenWidth/32);
+        rulesText.setCenter(rulesButton.getCenter().getX() + screenWidth/400, rulesButton.getCenter().getY() + screenHeight/125);
+        rulesButton.setMouseClickedHandler(this::switchToTitleScreen);
+        rulesText.setMouseClickedHandler(this::switchToTitleScreen);
+
     }
 
     /*
