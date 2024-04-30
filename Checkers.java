@@ -56,9 +56,18 @@ public class Checkers {
         initiateSetup();
     }
 
+    /*
+    Switches to the rules screen, onclick method for rules button when on title screen
+    No return type
+    */
     public void switchToRulesScreen(Shape shp, double x, double y, int button) {
         drawRulesScreen();
     }
+
+    /*
+    Switches to the title screen, onclick method for rules button when on rules screen 
+    No return type
+    */
     public void switchToTitleScreen(Shape shp, double x, double y, int button) {
         p.clear();
         initiateSetup();
@@ -316,7 +325,11 @@ public class Checkers {
 
 
     }
-
+    /*
+    Draws the rules screen
+    Called when a player clicks on the Rules button
+    No return type
+    */
     public void drawRulesScreen() {
         rulesImg = new Image("Checkers_Rules.png", screenWidth/8, screenHeight/8, 3*(screenWidth/4), 3*(screenHeight/4));
         RoundRect rulesButton = new RoundRect(5*(screenWidth/6)-10, 10, screenWidth/6, screenHeight/12, 8, 8);
